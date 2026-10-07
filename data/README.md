@@ -37,7 +37,7 @@ The Hidroweb export has the following structure, which `01_preprocessing` assume
 - the daily series, one value per calendar day, 1900–2025 (46,021 days);
 - the annual-mean series used in the change-point and Hurst analyses.
 
-Steps: keep daily-summary rows only; where raw and consistency-reviewed versions of the same month exist, keep the one with more non-missing values (ties go to the consistency-reviewed version); convert the monthly rows to a daily sequence; fill gaps of up to three days by linear interpolation (27 days, 0.06%); compute the daily climatology and anomalies for the deseasonalized series.
+Steps: keep daily-summary rows only; where raw and consistency-reviewed versions of the same month exist, keep the one with more non-missing values (ties go to the consistency-reviewed version); convert the monthly rows to a daily sequence; fill the first three days of each gap by linear interpolation (26 of the 27 missing days, 0.06%; one day of a four-day gap stays missing and is ignored in the annual mean); compute the daily climatology and anomalies for the deseasonalized series.
 
 ## Quality summary
 

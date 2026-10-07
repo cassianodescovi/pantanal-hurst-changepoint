@@ -14,12 +14,21 @@ Steps
   3. For months with both raw and consistency-reviewed versions, keep the version with
      more non-missing daily values (ties go to the consistency-reviewed version).
   4. Reshape from one row per month (Cota01..Cota31) to one row per calendar day.
-  5. Fill gaps of up to MAX_GAP_DAYS consecutive days by linear interpolation.
+  5. Fill short gaps by linear interpolation (first MAX_GAP_DAYS days of each gap).
   6. Compute the daily climatology (mean by day of year) and the anomaly series.
   7. Aggregate to annual means.
 
 Usage
-  python scripts/01_preprocessing.py [--raw PATH] [--out DIR]
+  python scripts/01_preprocessing.py [--raw PATH] [--out DIR] [--end YYYY-MM-DD] [--max-gap N] [--fill-mode MODE]
+
+The series is trimmed at --end (default 2025-12-31, the window analysed in the manuscript),
+so that records added to the Hidroweb export after that date, including a partial final
+year, do not enter the analysis. --max-gap sets the longest gap (in days) that is filled by
+linear interpolation (default 3); --max-gap 0 leaves missing days unfilled, so that annual
+means are computed over the available days only. --fill-mode pandas-limit reproduces
+pandas' interpolate(limit=N), the default and the mode used for the manuscript: the first N
+days of EVERY gap are filled, including gaps longer than N. The stricter mode "gaps" fills only
+gaps of at most N days (the difference is one day of one four-day gap in this record).
 """
 import argparse
 from pathlib import Path
@@ -109,10 +118,22 @@ def fill_short_gaps(series, max_gap):
     return filled, fillable
 
 
+def fill_pandas_limit(series, limit):
+    """Same as series.interpolate(method="linear", limit=limit): fills the first `limit`
+    days of every gap, including the first days of gaps longer than `limit`."""
+    filled = series.interpolate(method="linear", limit=limit)
+    return filled, series.isna() & filled.notna()
+
+
 def main():
     parser = argparse.ArgumentParser(description="Preprocess the Ladario stage record.")
     parser.add_argument("--raw", type=Path, default=ROOT / "data" / "raw" / f"{STATION}_Cotas.csv")
     parser.add_argument("--out", type=Path, default=ROOT / "data" / "processed")
+    parser.add_argument("--end", default="2025-12-31", help="last date kept (default: 2025-12-31)")
+    parser.add_argument("--fill-mode", choices=["gaps", "pandas-limit"], default="pandas-limit",
+                        help="pandas-limit (default, as used in the manuscript): fill the first max-gap days of every gap; gaps: fill only gaps <= max-gap")
+    parser.add_argument("--max-gap", type=int, default=MAX_GAP_DAYS,
+                        help=f"longest gap filled by interpolation, in days (default: {MAX_GAP_DAYS}; 0 = no filling)")
     args = parser.parse_args()
 
     if not args.raw.exists():
@@ -124,13 +145,19 @@ def main():
 
     daily = to_daily(select_monthly_records(read_hidroweb(args.raw)))
 
+    end = pd.Timestamp(args.end)
+    if daily.index.max() > end:
+        print(f"Trimming the series at {end.date()} (the file extends to {daily.index.max().date()}).")
+        daily = daily.loc[:end]
+
     # Days with an observed stage value but no ANA status flag (mostly recent, not yet
     # reviewed). Computed before gap filling so interpolated days are not counted.
     daily["pending_review"] = daily["status"].isna() & daily["stage_cm"].notna()
     daily["status"] = daily["status"].astype("Int64")
 
     n_missing = int(daily["stage_cm"].isna().sum())
-    daily["stage_cm"], daily["interpolated"] = fill_short_gaps(daily["stage_cm"], MAX_GAP_DAYS)
+    fill = fill_short_gaps if args.fill_mode == "gaps" else fill_pandas_limit
+    daily["stage_cm"], daily["interpolated"] = fill(daily["stage_cm"], args.max_gap)
     n_remaining = int(daily["stage_cm"].isna().sum())
 
     # Daily climatology and anomalies (day of year; day 366 exists only in leap years)
@@ -140,6 +167,10 @@ def main():
     grouped = daily["stage_cm"].groupby(daily.index.year)
     annual = pd.DataFrame({"stage_cm": grouped.mean(), "n_days": grouped.count()})
     annual.index.name = "year"
+    incomplete = annual[annual["n_days"] < 360]
+    if len(incomplete):
+        print("WARNING: incomplete years in the annual series (annual means are not comparable):")
+        print(incomplete.to_string())
 
     daily.to_csv(args.out / "daily_stage_ladario.csv")
     annual.to_csv(args.out / "annual_mean_stage_ladario.csv")
@@ -151,7 +182,7 @@ def main():
                      for k, v in daily["status"].value_counts(dropna=False).items()}
     print(f"Status flags (1=real, 2=estimated): {status_counts}")
     print(f"Real-flag share: {100 * n_real / n:.2f}%")
-    print(f"Missing stage values: {n_missing}; filled (gaps <= {MAX_GAP_DAYS} d): "
+    print(f"Missing stage values: {n_missing}; filled ({args.fill_mode}, max-gap {args.max_gap}): "
           f"{int(daily['interpolated'].sum())}; remaining missing: {n_remaining}")
     print(f"Days pending review (stage present, no status flag): {int(daily['pending_review'].sum())}")
     print(f"Annual series: {len(annual)} years ({annual.index.min()}-{annual.index.max()})")
