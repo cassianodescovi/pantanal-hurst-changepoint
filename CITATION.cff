@@ -1,0 +1,32 @@
+cff-version: 1.2.0
+message: "If you use this code or data, please cite it as below."
+title: "pantanal-hurst-changepoint: code and processed data for 'Regime shifts or long-range dependence? Disentangling hydrological persistence in 126 years of Paraguay River stage data'"
+type: software
+authors:
+  - family-names: Descovi
+    given-names: Cassiano Sampaio
+    affiliation: "School of Civil Engineering, Architecture and Urban Planning (FECFAU), University of Campinas (UNICAMP), Brazil"
+    # orcid: "https://orcid.org/0000-0000-0000-0000"
+  - family-names: Zuffo
+    given-names: Antonio Carlos
+    affiliation: "School of Civil Engineering, Architecture and Urban Planning (FECFAU), University of Campinas (UNICAMP), Brazil"
+    # orcid: "https://orcid.org/0000-0000-0000-0000"
+  - family-names: Mohammadizadeh
+    given-names: SeyedMehdi
+    affiliation: "Offshore Technology Innovation Centre (OTIC), Polytechnic School, University of Sao Paulo (USP), Brazil"
+    # orcid: "https://orcid.org/0000-0000-0000-0000"
+repository-code: "https://github.com/cassianodescovi/pantanal-hurst-changepoint"
+url: "https://github.com/cassianodescovi/pantanal-hurst-changepoint"
+license: MIT
+abstract: "Analysis pipeline testing whether regime shifts reported in the Pantanal hydrological literature can be distinguished from long-range dependence, using 126 years (1900-2025) of daily Paraguay River stage data at Ladario, Brazil: change-point detection, Hurst-exponent estimation, Monte Carlo experiments, and a neural-network anomaly detector."
+keywords:
+  - hydrology
+  - Pantanal
+  - Hurst exponent
+  - long-range dependence
+  - change-point detection
+  - time series
+# Add after the first Zenodo release:
+# version: "1.0.0"
+# date-released: "YYYY-MM-DD"
+# doi: 10.5281/zenodo.XXXXXXX
