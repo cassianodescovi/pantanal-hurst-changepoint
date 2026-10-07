@@ -1,0 +1,30 @@
+# ANA files are NOT redistributed (see data/README.md)
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.egg-info/
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# LaTeX build artifacts (if the manuscript is ever added)
+*.aux
+*.log
+*.out
+*.bbl
+*.blg
+*.synctex.gz
