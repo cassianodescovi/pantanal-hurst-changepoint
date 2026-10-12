@@ -16,7 +16,7 @@ This repository contains the analysis pipeline used to test whether the regime s
 - Bidirectional Monte Carlo experiments: false-positive rate of the Pettitt test under fractional Gaussian noise, shift-only null distributions of H, and small-sample calibration of regime-level estimates
 - Confidence intervals: moving block bootstrap and parametric (fGn) bootstrap
 - Walk-forward neural-network residual-anomaly detector, with sensitivity to architecture, lag window, and flagging threshold, and a linear AR(p) baseline
-- All figures and tables of the manuscript
+- All figures of the manuscript, and the tables as CSV files (see below)
 
 ## Repository structure
 
@@ -35,7 +35,7 @@ This repository contains the analysis pipeline used to test whether the regime s
 │   ├── 03_hurst
 │   ├── 04_montecarlo
 │   ├── 05_nn_detector
-│   └── 06_figures_tables
+│   └── 06_figures
 ├── results/
 │   ├── tables/            tables as CSV
 │   └── intermediate/      saved outputs of long-running steps
@@ -73,7 +73,21 @@ Run the scripts in numerical order, from the repository root:
 3. `03_hurst`: R/S, DFA, GPH, their sensitivity analyses, and the block and parametric bootstrap intervals
 4. `04_montecarlo`: false-positive curve, shift-only nulls (three regime structures), regime-level calibration
 5. `05_nn_detector`: walk-forward neural-network detector, sensitivity grid, threshold sensitivity, AR baseline
-6. `06_figures_tables`: regenerates all figures and tables from the saved results
+6. `06_figures`: regenerates the manuscript figures from the saved tables (the study-area map is made in QGIS)
+
+## Where each manuscript table and figure comes from
+
+| Manuscript item | Source (in `results/tables/` unless noted) | Script |
+|---|---|---|
+| Data-quality table | `data_quality.csv`, `data_quality_unflagged_by_year.csv` | 01 |
+| Change points (Pettitt) | `pettitt_sequential.csv`, `regimes_pettitt_sequential.csv` | 02 |
+| PELT sensitivity table | `pelt_plateaus.csv`, `pelt_sensitivity.csv` (`jump=1` rows) | 02 |
+| Hurst summary and GPH tables | `hurst_estimates.csv`, `gph_sensitivity.csv`, `bootstrap_block.csv`, `bootstrap_parametric.csv` | 03 |
+| False-positive table | `fp_rate.csv` | 04 |
+| Shift-only null table | `shift_only_null.csv` | 04 |
+| Regime-level table | `regime_level.csv` | 04 |
+| Neural-network cross-check and sensitivity tables | `nn_flagged_by_year.csv`, `nn_sensitivity_grid.csv`, `nn_ar_baseline.csv` | 05 |
+| Figures | `figures/*.png` and `*.pdf` (study-area map: QGIS) | 06 |
 
 ## Reproducibility notes
 

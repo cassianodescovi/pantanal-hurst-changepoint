@@ -1,0 +1,12 @@
+metric,value
+n_days,46021
+start,1900-01-01
+end,2025-12-31
+status_1_real,45790
+status_2_estimated,25
+no_flag,206
+missing_stage_values,27
+filled_by_interpolation,26
+remaining_missing,1
+pending_review_with_stage,179
+real_flag_share_pct,99.5

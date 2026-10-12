@@ -7,6 +7,8 @@ Ladario station (ANA code 66825000) from the raw Hidroweb export.
 Input  : data/raw/66825000_Cotas.csv     (not distributed; see data/README.md)
 Output : data/processed/daily_stage_ladario.csv
          data/processed/annual_mean_stage_ladario.csv
+         results/tables/data_quality.csv                       summary counts (manuscript Table 1)
+         results/tables/data_quality_unflagged_by_year.csv     days without an ANA status flag, by year
 
 Steps
   1. Read the Hidroweb export (latin-1, ';' separated, metadata block before the table).
@@ -19,7 +21,7 @@ Steps
   7. Aggregate to annual means.
 
 Usage
-  python scripts/01_preprocessing.py [--raw PATH] [--out DIR] [--end YYYY-MM-DD] [--max-gap N] [--fill-mode MODE]
+  python scripts/01_preprocessing.py [--raw PATH] [--out DIR] [--tables DIR] [--end YYYY-MM-DD] [--max-gap N] [--fill-mode MODE]
 
 The series is trimmed at --end (default 2025-12-31, the window analysed in the manuscript),
 so that records added to the Hidroweb export after that date, including a partial final
@@ -129,6 +131,7 @@ def main():
     parser = argparse.ArgumentParser(description="Preprocess the Ladario stage record.")
     parser.add_argument("--raw", type=Path, default=ROOT / "data" / "raw" / f"{STATION}_Cotas.csv")
     parser.add_argument("--out", type=Path, default=ROOT / "data" / "processed")
+    parser.add_argument("--tables", type=Path, default=ROOT / "results" / "tables", help="where the summary tables are written")
     parser.add_argument("--end", default="2025-12-31", help="last date kept (default: 2025-12-31)")
     parser.add_argument("--fill-mode", choices=["gaps", "pandas-limit"], default="pandas-limit",
                         help="pandas-limit (default, as used in the manuscript): fill the first max-gap days of every gap; gaps: fill only gaps <= max-gap")
@@ -142,6 +145,7 @@ def main():
             "Download the station file from Hidroweb and place it there (see data/README.md)."
         )
     args.out.mkdir(parents=True, exist_ok=True)
+    args.tables.mkdir(parents=True, exist_ok=True)
 
     daily = to_daily(select_monthly_records(read_hidroweb(args.raw)))
 
@@ -177,6 +181,17 @@ def main():
 
     n = len(daily)
     n_real = int((daily["status"] == 1).sum())
+    unflagged = daily[daily["status"].isna()]
+    pd.DataFrame({"metric": ["n_days", "start", "end", "status_1_real", "status_2_estimated", "no_flag",
+                             "missing_stage_values", "filled_by_interpolation", "remaining_missing",
+                             "pending_review_with_stage", "real_flag_share_pct"],
+                  "value": [n, daily.index.min().date(), daily.index.max().date(), n_real,
+                            int((daily["status"] == 2).sum()), len(unflagged), n_missing,
+                            int(daily["interpolated"].sum()), n_remaining,
+                            int(daily["pending_review"].sum()), round(100 * n_real / n, 2)]}
+                 ).to_csv(args.tables / "data_quality.csv", index=False)
+    unflagged.groupby(unflagged.index.year).size().rename("days_without_flag").rename_axis("year").to_csv(
+        args.tables / "data_quality_unflagged_by_year.csv")
     print(f"Daily series: {daily.index.min().date()} to {daily.index.max().date()} ({n:,} days)")
     status_counts = {("no flag" if pd.isna(k) else int(k)): int(v)
                      for k, v in daily["status"].value_counts(dropna=False).items()}
