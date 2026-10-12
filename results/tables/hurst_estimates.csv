@@ -1,0 +1,7 @@
+estimate,value,note
+DFA daily raw,1.4855887130740837,alpha; > 1: non-stationary range
+DFA daily anomaly,1.533443626074003,alpha; > 1: non-stationary range
+DFA-1 annual,0.9374162431441772,alpha = H if alpha < 1
+DFA-1 annual (least-squares fit),0.9374162431441783,check of the default RANSAC fit
+DFA-2 annual,1.0301024036142699,crosses alpha = 1
+R/S annual,0.8283045607067139,H
