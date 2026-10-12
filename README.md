@@ -34,9 +34,8 @@ This repository contains the analysis pipeline used to test whether the regime s
 │   ├── 02_changepoints
 │   ├── 03_hurst
 │   ├── 04_montecarlo
-│   ├── 05_bootstrap
-│   ├── 06_nn_detector
-│   └── 07_figures_tables
+│   ├── 05_nn_detector
+│   └── 06_figures_tables
 ├── results/
 │   ├── tables/            tables as CSV
 │   └── intermediate/      saved outputs of long-running steps
@@ -71,15 +70,14 @@ Run the scripts in numerical order, from the repository root:
 
 1. `01_preprocessing`: reads the ANA file in `data/raw/` and builds the cleaned daily series and the annual series in `data/processed/`
 2. `02_changepoints`: Pettitt, Bonferroni, PELT, penalty sensitivity, BIC
-3. `03_hurst`: R/S, DFA, GPH and their sensitivity analyses
-4. `04_montecarlo`: false-positive curve, shift-only nulls, regime-level calibration
-5. `05_bootstrap`: block and parametric bootstrap intervals
-6. `06_nn_detector`: walk-forward neural-network detector, sensitivity grid, threshold sensitivity, AR baseline
-7. `07_figures_tables`: regenerates all figures and tables from the saved results
+3. `03_hurst`: R/S, DFA, GPH, their sensitivity analyses, and the block and parametric bootstrap intervals
+4. `04_montecarlo`: false-positive curve, shift-only nulls (three regime structures), regime-level calibration
+5. `05_nn_detector`: walk-forward neural-network detector, sensitivity grid, threshold sensitivity, AR baseline
+6. `06_figures_tables`: regenerates all figures and tables from the saved results
 
 ## Reproducibility notes
 
-- Random seeds are fixed at the top of each script. Monte Carlo and bootstrap results reproduce up to sampling variation; small differences in the last digit of reported rates are expected across platforms and package versions.
+- Random seeds are fixed at the top of each script. Monte Carlo and bootstrap results reproduce up to sampling variation; the Monte Carlo rates carry a standard error of about 1.5 percentage points at M = 1000 (use `--m-fp 5000` in `04_montecarlo` for a tighter estimate), and the last digits of bootstrap intervals can differ across platforms and package versions.
 - The slowest step is the walk-forward neural-network detector (W = 60, R = 50 runs). Its outputs are stored in `results/intermediate/` so that figures and tables can be regenerated without re-running it.
 - Two estimators have known sample-size behavior discussed in the paper: R/S is biased downward at n = 126, and DFA results are sensitive to the detrending order when the scaling exponent is near 1.
 
