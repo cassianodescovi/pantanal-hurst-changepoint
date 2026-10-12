@@ -25,6 +25,7 @@ This repository contains the analysis pipeline used to test whether the regime s
 ├── LICENSE
 ├── CITATION.cff
 ├── requirements.txt
+├── requirements-lock.txt
 ├── data/
 │   ├── README.md          data origin, period, and terms of use
 │   ├── raw/               place the files downloaded from ANA here (not tracked by git)
@@ -62,7 +63,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Python version: [to be filled in]. Exact package versions are pinned in `requirements.txt`. Main dependencies: numpy, pandas, scipy, scikit-learn, statsmodels, matplotlib, nolds, hurst, fbm, pyhomogeneity, ruptures.
+Python version: 3.11 or newer (results were produced with [X.Y, to be filled in]). The direct dependencies are pinned in `requirements.txt`; `requirements-lock.txt` is the full `pip freeze` of the environment used.
 
 ## Usage
 
@@ -101,7 +102,7 @@ The code is released under the MIT License (see `LICENSE`). The license covers t
 
 ## How to cite
 
-If you use this code, please cite the paper above and the archived repository: [Zenodo DOI to be added]. Citation metadata is provided in `CITATION.cff`.
+If you use this code, please cite the paper above and the archived repository, deposited in the Unicamp Research Data Repository (REDU): [REDU DOI to be added]. Citation metadata is provided in `CITATION.cff`.
 
 ## Contact
 
