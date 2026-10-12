@@ -106,5 +106,5 @@ If you use this code, please cite the paper above and the archived repository, d
 
 ## Contact
 
-Cassiano Sampaio Descovi — [institutional e-mail]
+Cassiano Sampaio Descovi — cassianodescovi@fec.unicamp.br
 School of Civil Engineering, Architecture and Urban Planning (FECFAU), University of Campinas (UNICAMP), Brazil

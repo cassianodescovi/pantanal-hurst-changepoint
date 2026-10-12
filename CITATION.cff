@@ -26,7 +26,7 @@ keywords:
   - long-range dependence
   - change-point detection
   - time series
-# Add after the first Zenodo release:
+# Add after the deposit in REDU (Unicamp Research Data Repository):
 # version: "1.0.0"
 # date-released: "YYYY-MM-DD"
-# doi: 10.5281/zenodo.XXXXXXX
+# doi: 10.25824/redu/XXXXXX
